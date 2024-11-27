@@ -126,7 +126,7 @@ nextflow run ${__tool_directory__}/CSP2/CSP2.nf -profile standard_conda --runmod
 	</tests>
     
     <help>
-    This tool takes query assemblies and reference assemblies and calculates the pairwise distance between each query/reference combination. If no reference is provided, all queries are compared to all other queries.
+    This tool takes query assemblies and reference assemblies (or reads) and calculates the pairwise distance between each query/reference combination. If no reference is provided, all queries are compared to all other queries.
     </help>
 
 </tool>

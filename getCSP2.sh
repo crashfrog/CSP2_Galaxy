@@ -6,3 +6,4 @@ nextflow run CSP2/CSP2.nf -profile standard_conda --runmode conda_init
 rm -rf ./.nextflow* ./.git* ./work ./getCSP2.sh ./README.md ./LICENSE
 cd ..
 mv CSP2_Galaxy csp2
+cd csp2

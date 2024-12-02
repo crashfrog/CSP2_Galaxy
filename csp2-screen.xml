@@ -59,14 +59,11 @@ fi;
 nextflow run ${__tool_directory__}/CSP2/CSP2.nf -profile standard_conda --runmode screen \$QUERY_FASTA_ARG \$REF_FASTA_ARG \$QUERY_READS_ARG \$REF_READS_ARG \$REF_ID_ARG \$TRIM_ARG --readext $readext --forward $forward --reverse $reverse --ref_readext $readext --ref_forward $forward --ref_reverse $reverse --min_cov $min_cov --min_iden $min_iden --min_len $min_len --ref_edge $ref_edge --query_edge $query_edge --dwin $dwin --wsnps $wsnps --cores 8 --out \$CSP2_DIR/CSP2_Screen_Output;
 ]]>
 	</command>
-  
 	<inputs>
 		<param name="query_fasta" type="data" format="fasta" value="" label="Query assemblies" multiple="true" optional="true" />
 		<param name="ref_fasta" type="data" format="fasta" value="" label="Reference assemblies" multiple="true" optional="true" />
-
 		<param name="query_reads" type="data" format="fastq,fastq.gz" value="" label="Query reads" multiple="true" optional="true" />
 		<param name="ref_reads" type="data" format="fastq,fastq.gz" value="" label="Reference reads" multiple="true" optional="true" />
-
 		<param name="min_cov" type="float" value="85" label="Minimum reference genome coverage to proceed with distance estimation" optional="true" />
 		<param name="min_iden" type="float" value="99" label="Minimum alignment percent identity to detect SNPs" optional="true" />
 		<param name="min_len" type="integer" value="500" label="Minimum alignment length to detect SNPs" optional="true" />
@@ -74,19 +71,16 @@ nextflow run ${__tool_directory__}/CSP2/CSP2.nf -profile standard_conda --runmod
 		<param name="query_edge" type="integer" value="150" label="Prune SNPs within this many bases of query contig edge" optional="true" />
 		<param name="dwin" type="text" value="1000,125,15" label="Comma-separated set of window sizes for SNP density filtration (Set to 0 to disable density filtration)" optional="true" />
 		<param name="wsnps" type="text" value="3,2,1" label="Comma-separated list of maximum SNP counts per density window" optional="true" />
-
 		<param name="readext" type="text" value="fastq.gz" label="Read extension format (e.g., fastq.gz)" optional="true" />
 		<param name="forward" type="text" value="_1.fastq.gz" label="Forward read suffix (e.g. _1.fastq.gz)" optional="true" />
 		<param name="reverse" type="text" value="_2.fastq.gz" label="Forward read suffix (e.g. _2.fastq.gz)" optional="true" />
 		<param name="trim_name" type="text" value="" label="Text to remove from all file names (e.g., _contigs_skesa)" optional="true" />
 		<param name="ref_id" type="text" value="" label="Comma-separated list of desired Reference IDs (e.g., Sample_A,Sample_B)" optional="true" />
 	</inputs>
-
 	<outputs>
 		<data name="screening_results" format="tabular" label="Screening Results" from_work_dir="CSP2_Screen_Output/Screening_Results.tsv" />
 		<data name="isolate_data" format="tabular" label="Isolate Data" from_work_dir="CSP2_Screen_Output/Isolate_Data.tsv" />
 	</outputs>
-  
 	<tests>
 		<test>
 			<param name="query_fasta">
@@ -118,14 +112,11 @@ nextflow run ${__tool_directory__}/CSP2/CSP2.nf -profile standard_conda --runmod
             <param name="readext" value="fq.gz" />
             <param name="forward" value="_1.fq.gz" />
             <param name="reverse" value="_2.fq.gz" />
-
 			<output name="screening_results" format="tabular" value="Screening_Results.tsv" />
 			<output name="isolate_data" format="tabular" value="Isolate_Data.tsv" />
 		</test>
 	</tests>
-    
     <help>
     This tool takes query assemblies and reference assemblies and calculates the pairwise distance between each query/reference combination. If no reference is provided, all queries are compared to all other queries.
     </help>
-
 </tool>

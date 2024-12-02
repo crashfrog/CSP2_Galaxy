@@ -1,11 +1,9 @@
 <tool id="csp2-screen" name="CSP2 (Screening Mode)" version="0.9.7">
 	<description>Screen query assemblies against reference assemblies</description>
-	
-	<requirements>
-	 <requirement type="package" version="24.10.1">nextflow</requirement>
-	 <requirement type="package" version="2.0.2">micromamba</requirement>
+    <requirements>
+	    <requirement type="package" version="24.10.1">nextflow</requirement>
+	    <requirement type="package" version="2.0.2">micromamba</requirement>
 	</requirements>
-	
 	<command detect_errors="aggressive"><![CDATA[
 export CSP2_DIR=\$PWD;
 mkdir -p \$CSP2_DIR/queries \$CSP2_DIR/references;
@@ -58,7 +56,7 @@ else
     export REF_ID_ARG="";
 fi;
 
-nextflow run ${__tool_directory__}/CSP2/CSP2.nf -profile standard_conda --runmode screen \$QUERY_FASTA_ARG \$REF_FASTA_ARG \$QUERY_READS_ARG \$REF_READS_ARG \$REF_ID_ARG --readext $readext --forward $forward --reverse $reverse --ref_readext $readext --ref_forward $forward --ref_reverse $reverse --min_cov $min_cov --min_iden $min_iden --min_len $min_len --ref_edge $ref_edge --query_edge $query_edge --dwin $dwin --wsnps $wsnps --cores 8 \$TRIM_ARG --out \$CSP2_DIR/CSP2_Screen_Output;
+nextflow run ${__tool_directory__}/CSP2/CSP2.nf -profile standard_conda --runmode screen \$QUERY_FASTA_ARG \$REF_FASTA_ARG \$QUERY_READS_ARG \$REF_READS_ARG \$REF_ID_ARG \$TRIM_ARG --readext $readext --forward $forward --reverse $reverse --ref_readext $readext --ref_forward $forward --ref_reverse $reverse --min_cov $min_cov --min_iden $min_iden --min_len $min_len --ref_edge $ref_edge --query_edge $query_edge --dwin $dwin --wsnps $wsnps --cores 8 --out \$CSP2_DIR/CSP2_Screen_Output;
 ]]>
 	</command>
   
@@ -114,6 +112,7 @@ nextflow run ${__tool_directory__}/CSP2/CSP2.nf -profile standard_conda --runmod
                 <collection type="list">
                 <element name="Forward" value="reads/Week_42_Reads_1.fq.gz" />
                 <element name="Reverse" value="reads/Week_42_Reads_2.fq.gz" />
+                </collection>
 			</param>
             <param name="ref_id" value="Sample_A,Sample_B" />
             <param name="readext" value="fq.gz" />
@@ -126,7 +125,7 @@ nextflow run ${__tool_directory__}/CSP2/CSP2.nf -profile standard_conda --runmod
 	</tests>
     
     <help>
-    This tool takes query assemblies and reference assemblies (or reads) and calculates the pairwise distance between each query/reference combination. If no reference is provided, all queries are compared to all other queries.
+    This tool takes query assemblies and reference assemblies and calculates the pairwise distance between each query/reference combination. If no reference is provided, all queries are compared to all other queries.
     </help>
 
 </tool>

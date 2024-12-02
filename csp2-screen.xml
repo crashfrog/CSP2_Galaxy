@@ -56,7 +56,7 @@ else
     export REF_ID_ARG="";
 fi;
 
-nextflow run ${__tool_directory__}/CSP2/CSP2.nf -profile standard_conda --runmode screen \$QUERY_FASTA_ARG \$REF_FASTA_ARG \$QUERY_READS_ARG \$REF_READS_ARG \$REF_ID_ARG \$TRIM_ARG --readext $readext --forward $forward --reverse $reverse --ref_readext $readext --ref_forward $forward --ref_reverse $reverse --min_cov $min_cov --min_iden $min_iden --min_len $min_len --ref_edge $ref_edge --query_edge $query_edge --dwin $dwin --wsnps $wsnps --cores 8 --out \$CSP2_DIR/CSP2_Screen_Output;
+nextflow run ${__tool_directory__}/CSP2/CSP2.nf -profile csp2_galaxy --runmode screen \$QUERY_FASTA_ARG \$REF_FASTA_ARG \$QUERY_READS_ARG \$REF_READS_ARG \$REF_ID_ARG \$TRIM_ARG --readext $readext --forward $forward --reverse $reverse --ref_readext $readext --ref_forward $forward --ref_reverse $reverse --min_cov $min_cov --min_iden $min_iden --min_len $min_len --ref_edge $ref_edge --query_edge $query_edge --dwin $dwin --wsnps $wsnps --cores 8 --out \$CSP2_DIR/CSP2_Screen_Output;
 ]]>
 	</command>
 	<inputs>
@@ -112,11 +112,16 @@ nextflow run ${__tool_directory__}/CSP2/CSP2.nf -profile standard_conda --runmod
             <param name="readext" value="fq.gz" />
             <param name="forward" value="_1.fq.gz" />
             <param name="reverse" value="_2.fq.gz" />
-			<output name="screening_results" format="tabular" value="Screening_Results.tsv" />
-			<output name="isolate_data" format="tabular" value="Isolate_Data.tsv" />
+			<output name="screening_results" value="Screening_Results.tsv" />
+			<output name="isolate_data" value="Isolate_Data.tsv" />
 		</test>
 	</tests>
     <help>
     This tool takes query assemblies and reference assemblies and calculates the pairwise distance between each query/reference combination. If no reference is provided, all queries are compared to all other queries.
     </help>
+    <citations>
+        <citation type="doi">10.XXXX/placeholder.doi</citation>
+        <citation type="bibtex">@article{example2024,title={CFSAN SNP Pipeline 2 (CSP2): a pipeline for fast and accurate SNP distance estimation from bacterial genome assemblies.},author={Doe, John and Smith, Jane},journal={Submitted},year={2024}}
+        </citation>
+    </citations>
 </tool>

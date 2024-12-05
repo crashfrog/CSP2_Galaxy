@@ -57,7 +57,7 @@ else
         export RESCUE_ARG="";
 fi;
 
-nextflow run ${__tool_directory__}/CSP2/CSP2.nf -profile csp2_galaxy1 --runmode snp \$QUERY_FASTA_ARG \$REF_FASTA_ARG \$QUERY_READS_ARG \$REF_READS_ARG \$TRIM_ARG \$RESCUE_ARG --readext $readext --forward $forward --reverse $reverse --ref_readext $readext --ref_forward $forward --ref_reverse $reverse --min_cov $min_cov --min_iden $min_iden --min_len $min_len --ref_edge $ref_edge --query_edge $query_edge --dwin $dwin --wsnps $wsnps --max_missing $max_missing --out \$CSP2_DIR/CSP2_SNP_Output > Nextflow_Log.txt 2>&1;
+nextflow run ${__tool_directory__}/CSP2/CSP2.nf -profile csp2_galaxy --runmode snp \$QUERY_FASTA_ARG \$REF_FASTA_ARG \$QUERY_READS_ARG \$REF_READS_ARG \$TRIM_ARG \$RESCUE_ARG --readext $readext --forward $forward --reverse $reverse --ref_readext $readext --ref_forward $forward --ref_reverse $reverse --min_cov $min_cov --min_iden $min_iden --min_len $min_len --ref_edge $ref_edge --query_edge $query_edge --dwin $dwin --wsnps $wsnps --max_missing $max_missing --out \$CSP2_DIR/CSP2_SNP_Output > Nextflow_Log.txt 2>&1;
 
 mkdir -p Output; for file in CSP2_SNP_Output/SNP_Analysis/*/*; do ln -sf "\$file" Output/; done;
 zip -r CSP2_Output.zip CSP2_SNP_Output;

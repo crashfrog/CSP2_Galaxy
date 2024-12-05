@@ -51,27 +51,17 @@ else
         export TRIM_ARG="";
 fi;
 
-if [ -n "$ref_id" ] && [ "$ref_id" != "None" ]; then
-        export REF_ID_ARG="--ref_id $ref_id";
-else
-        export REF_ID_ARG="";
-fi;
-
 if [[ "$rescue" == "true" ]]; then
         export RESCUE_ARG="--rescue";
 else
         export RESCUE_ARG="";
 fi;
 
-if [[ "$ondemand" == "true" ]]; then
-        export PROFILE_ARG="-profile csp2_galaxy1";
-else
-        export PROFILE_ARG="-profile csp2_galaxy2";
-fi;
+nextflow run ${__tool_directory__}/CSP2/CSP2.nf -profile csp2_galaxy1 --runmode snp \$QUERY_FASTA_ARG \$REF_FASTA_ARG \$QUERY_READS_ARG \$REF_READS_ARG \$TRIM_ARG \$RESCUE_ARG --readext $readext --forward $forward --reverse $reverse --ref_readext $readext --ref_forward $forward --ref_reverse $reverse --min_cov $min_cov --min_iden $min_iden --min_len $min_len --ref_edge $ref_edge --query_edge $query_edge --dwin $dwin --wsnps $wsnps --max_missing $max_missing --out \$CSP2_DIR/CSP2_SNP_Output > Nextflow_Log.txt 2>&1;
 
-nextflow run ${__tool_directory__}/CSP2/CSP2.nf \$PROFILE_ARG --runmode snp \$QUERY_FASTA_ARG \$REF_FASTA_ARG \$QUERY_READS_ARG \$REF_READS_ARG \$REF_ID_ARG \$TRIM_ARG \$RESCUE_ARG --readext $readext --forward $forward --reverse $reverse --ref_readext $readext --ref_forward $forward --ref_reverse $reverse --min_cov $min_cov --min_iden $min_iden --min_len $min_len --ref_edge $ref_edge --query_edge $query_edge --dwin $dwin --wsnps $wsnps --max_missing $max_missing --n_ref $n_ref --out \$CSP2_DIR/CSP2_SNP_Output > Nextflow_Log.txt 2>&1;
+mkdir -p Output; for file in CSP2_SNP_Output/SNP_Analysis/*/*; do ln -sf "\$file" Output/; done;
 zip -r CSP2_Output.zip CSP2_SNP_Output;
-        ]]>
+]]>
         </command>
         <inputs>
                 <param name="query_fasta" type="data" format="fasta" value="" label="Query assemblies" multiple="true" optional="true" />
@@ -89,33 +79,19 @@ zip -r CSP2_Output.zip CSP2_SNP_Output;
                 <param name="forward" type="text" value="_1.fastq.gz" label="Forward read suffix (e.g. _1.fastq.gz)" optional="true" />
                 <param name="reverse" type="text" value="_2.fastq.gz" label="Forward read suffix (e.g. _2.fastq.gz)" optional="true" />
                 <param name="trim_name" type="text" value="" label="Text to remove from all file names (e.g., _contigs_skesa)" optional="true" />
-                <param name="ref_id" type="text" value="" label="Comma-separated list of desired Reference IDs (e.g., Sample_A,Sample_B)" optional="true" />
                 <param name="rescue" type="boolean" value="false" label="Enable SNP edge rescue mode" optional="true" />
                 <param name="max_missing" type="float" value="50" label="Maximum percent of isolates allowed to have missing data to retain a SNP" optional="true" />
-                <param name="n_ref" type="integer" value="1" label="Number of reference isolates for CSP2 to select" optional="true" />
-                <param name="ondemand" type="boolean" value="true" label="Use -profile csp2_galaxy1 (ondemand-small queue; set to false to use csp2_galaxy2 q8cpu)" optional="true" />
         </inputs>
         <outputs>
-                <data name="raw_mummer" format="tabular" label="Raw MUMmer Output" from_work_dir="CSP2_SNP_Output/Raw_MUMmer_Summary.tsv" />
-                <data name="isolate_data" format="tabular" label="Isolate Data" from_work_dir="CSP2_SNP_Output/Isolate_Data.tsv" />
                 <data name="nextflow_log" format="txt" label="Nextflow Log" from_work_dir="Nextflow_Log.txt" />
+                <data name="isolate_data" format="tabular" label="Isolate Data" from_work_dir="CSP2_SNP_Output/Isolate_Data.tsv" />
+                <data name="raw_mummer" format="tabular" label="Raw MUMmer Output" from_work_dir="CSP2_SNP_Output/Raw_MUMmer_Summary.tsv" />
+                <data name="reference_screening" format="tabular" label="Reference Screening Data" from_work_dir="Output/Reference_Screening.tsv" />
+                <data name="csp2_log" format="txt" label="CSP2 Log" from_work_dir="Output/CSP2_SNP_Pipeline.log" />
+                <data name="snp_matrix" format="tabular" label="Preserved SNP Matrix" from_work_dir="Output/snp_distance_matrix_preserved.tsv" />
+                <data name="snp_pairwise" format="tabular" label="Preserved SNP Pairwise Distances" from_work_dir="Output/snp_distance_pairwise_preserved.tsv" />
+                <data name="snp_alignment" format="fasta" label="Preserved SNP Alignment" from_work_dir="Output/snpma_preserved.fasta" />
                 <data name="csp2_zip" format="zip" label="Zipped Output" from_work_dir="CSP2_Output.zip" />
-
-                <collection name="snp_pipeline_output" type="list">
-                        <discover_datasets pattern="(?P&lt;reference_id&gt;.+)/CSP2_SNP_Pipeline\.log" ext="txt" directory="./CSP2_SNP_Output/SNP_Analysis" visible="true" />
-                        <discover_datasets pattern="(?P&lt;reference_id&gt;.+)/snplist\.txt" ext="txt" directory="./CSP2_SNP_Output/SNP_Analysis" visible="true" />
-                        <discover_datasets pattern="(?P&lt;reference_id&gt;.+)/snplist_preserved\.txt" ext="txt" directory="./CSP2_SNP_Output/SNP_Analysis" visible="true" />
-                        <discover_datasets pattern="(?P&lt;reference_id&gt;.+)/Reference_Screening\.tsv" ext="tabular" directory="./CSP2_SNP_Output/SNP_Analysis" visible="true" />
-                        <discover_datasets pattern="(?P&lt;reference_id&gt;.+)/Locus_Categories\.tsv" ext="tabular" directory="./CSP2_SNP_Output/SNP_Analysis" visible="true" />
-                        <discover_datasets pattern="(?P&lt;reference_id&gt;.+)/Query_Coverage\.tsv" ext="tabular" directory="./CSP2_SNP_Output/SNP_Analysis" visible="true" />
-                        <discover_datasets pattern="(?P&lt;reference_id&gt;.+)/snp_distance_matrix_preserved\.tsv" ext="tabular" directory="./CSP2_SNP_Output/SNP_Analysis" visible="true" />
-                        <discover_datasets pattern="(?P&lt;reference_id&gt;.+)/snp_distance_matrix\.tsv" ext="tabular" directory="./CSP2_SNP_Output/SNP_Analysis" visible="true" />
-                        <discover_datasets pattern="(?P&lt;reference_id&gt;.+)/snp_distance_pairwise_preserved\.tsv" ext="tabular" directory="./CSP2_SNP_Output/SNP_Analysis" visible="true" />
-                        <discover_datasets pattern="(?P&lt;reference_id&gt;.+)/snp_distance_pairwise\.tsv" ext="tabular" directory="./CSP2_SNP_Output/SNP_Analysis" visible="true" />
-                        <discover_datasets pattern="(?P&lt;reference_id&gt;.+)/snpma_preserved\.fasta" ext="fasta" directory="./CSP2_SNP_Output/SNP_Analysis" visible="true" />
-                        <discover_datasets pattern="(?P&lt;reference_id&gt;.+)/snpma\.fasta" ext="fasta" directory="./CSP2_SNP_Output/SNP_Analysis" visible="true" />
-                </collection>
-
         </outputs>
         <tests>
                 <test>

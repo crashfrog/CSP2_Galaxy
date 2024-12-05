@@ -57,7 +57,13 @@ else
         export REF_ID_ARG="";
 fi;
 
-nextflow run ${__tool_directory__}/CSP2/CSP2.nf -profile csp2_galaxy --cores 2 --runmode screen \$QUERY_FASTA_ARG \$REF_FASTA_ARG \$QUERY_READS_ARG \$REF_READS_ARG \$REF_ID_ARG \$TRIM_ARG --readext $readext --forward $forward --reverse $reverse --ref_readext $readext --ref_forward $forward --ref_reverse $reverse --min_cov $min_cov --min_iden $min_iden --min_len $min_len --ref_edge $ref_edge --query_edge $query_edge --dwin $dwin --wsnps $wsnps --out \$CSP2_DIR/CSP2_Screen_Output > Nextflow_Log.txt 2>&1;
+if [[ "$ondemand" == "true" ]]; then
+        export PROFILE_ARG="-profile csp2_galaxy1";
+else
+        export PROFILE_ARG="-profile csp2_galaxy2";
+fi;
+
+nextflow run ${__tool_directory__}/CSP2/CSP2.nf \$PROFILE_ARG --runmode screen \$QUERY_FASTA_ARG \$REF_FASTA_ARG \$QUERY_READS_ARG \$REF_READS_ARG \$REF_ID_ARG \$TRIM_ARG --readext $readext --forward $forward --reverse $reverse --ref_readext $readext --ref_forward $forward --ref_reverse $reverse --min_cov $min_cov --min_iden $min_iden --min_len $min_len --ref_edge $ref_edge --query_edge $query_edge --dwin $dwin --wsnps $wsnps --out \$CSP2_DIR/CSP2_Screen_Output > Nextflow_Log.txt 2>&1;
 zip -r CSP2_Output.zip CSP2_Screen_Output;
 ]]>
         </command>
@@ -78,6 +84,7 @@ zip -r CSP2_Output.zip CSP2_Screen_Output;
                 <param name="reverse" type="text" value="_2.fastq.gz" label="Forward read suffix (e.g. _2.fastq.gz)" optional="true" />
                 <param name="trim_name" type="text" value="" label="Text to remove from all file names (e.g., _contigs_skesa)" optional="true" />
                 <param name="ref_id" type="text" value="" label="Comma-separated list of desired Reference IDs (e.g., Sample_A,Sample_B)" optional="true" />
+                <param name="ondemand" type="boolean" value="true" label="Use -profile csp2_galaxy1 (ondemand-small queue; set to false to use csp2_galaxy2 q8cpu)" optional="true" />
         </inputs>
         <outputs>
                 <data name="raw_mummer" format="tabular" label="Raw MUMmer Output" from_work_dir="CSP2_Screen_Output/Raw_MUMmer_Summary.tsv" />

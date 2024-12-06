@@ -87,13 +87,11 @@ zip -r CSP2_Output.zip CSP2_SNP_Output;
                 <data name="raw_mummer" format="tabular" label="Raw MUMmer Output" from_work_dir="CSP2_SNP_Output/Raw_MUMmer_Summary.tsv" />
                 <data name="csp2_zip" format="zip" label="Zipped Output" from_work_dir="CSP2_Output.zip" />
                 <collection name="reference_results" type="list:list">
-                        <discover_datasets pattern="*/" directory="CSP2_SNP_Output/SNP_Analysis" ext="auto">
-                                <discover_dataset pattern="CSP2_SNP_Pipeline.log" format="txt" visible="true" />
-                                <discover_dataset pattern="Reference_Screening.tsv" format="tabular" visible="true" />
-                                <discover_dataset pattern="snp_distance_matrix_preserved.tsv" format="tabular" visible="true" />
-                                <discover_dataset pattern="snp_distance_pairwise_preserved.tsv" format="tabular" visible="true" />
-                                <discover_dataset pattern="snpma_preserved.fasta" format="fasta" visible="true" />
-                        </discover_datasets>
+                        <discover_datasets pattern="*/CSP2_SNP_Pipeline.log" format="txt" visible="true" directory="./CSP2_SNP_Output/SNP_Analysis" />
+                        <discover_datasets pattern="*/Reference_Screening.tsv" format="tabular" visible="true" directory="./CSP2_SNP_Output/SNP_Analysis" />
+                        <discover_datasets pattern="*/snp_distance_matrix_preserved.tsv" format="tabular" visible="true" directory="./CSP2_SNP_Output/SNP_Analysis" />
+                        <discover_datasets pattern="*/snp_distance_pairwise_preserved.tsv" format="tabular" visible="true" directory="./CSP2_SNP_Output/SNP_Analysis" />
+                        <discover_datasets pattern="*/snpma_preserved.fasta" format="fasta" visible="true" directory="./CSP2_SNP_Output/SNP_Analysis" />
                 </collection>
         </outputs>
         <tests>

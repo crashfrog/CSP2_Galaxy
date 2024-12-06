@@ -58,7 +58,6 @@ else
 fi;
 
 nextflow run ${__tool_directory__}/CSP2/CSP2.nf -profile csp2_galaxy --runmode screen \$QUERY_FASTA_ARG \$REF_FASTA_ARG \$QUERY_READS_ARG \$REF_READS_ARG \$REF_ID_ARG \$TRIM_ARG --readext $readext --forward $forward --reverse $reverse --ref_readext $readext --ref_forward $forward --ref_reverse $reverse --min_cov $min_cov --min_iden $min_iden --min_len $min_len --ref_edge $ref_edge --query_edge $query_edge --dwin $dwin --wsnps $wsnps --out \$CSP2_DIR/CSP2_Screen_Output > Nextflow_Log.txt 2>&1;
-zip -r CSP2_Output.zip CSP2_Screen_Output;
 ]]>
         </command>
         <inputs>
@@ -84,7 +83,6 @@ zip -r CSP2_Output.zip CSP2_Screen_Output;
                 <data name="isolate_data" format="tabular" label="Isolate Data" from_work_dir="CSP2_Screen_Output/Isolate_Data.tsv" />
                 <data name="screening_results" format="tabular" label="Screening Results" from_work_dir="CSP2_Screen_Output/Screening_Results.tsv" />
                 <data name="nextflow_log" format="txt" label="Nextflow Log" from_work_dir="Nextflow_Log.txt" />
-                <data name="csp2_zip" format="zip" label="Zipped Output" from_work_dir="CSP2_Output.zip" />
         </outputs>
         <tests>
                 <test>

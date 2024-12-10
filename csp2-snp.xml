@@ -6,86 +6,98 @@
         </requirements>
         <version_command>nextflow -version</version_command>
         <command detect_errors="aggressive"><![CDATA[
-export CSP2_DIR=\$PWD;
-mkdir -p \$CSP2_DIR/queries \$CSP2_DIR/references;
-
-if [ -n "$query_fasta" ] && [ "$query_fasta" != "None" ]; then
-        #for query in $query_fasta:
-                        ln -sf ${query} \$CSP2_DIR/queries/${query.element_identifier};
-        #end for
-        export QUERY_FASTA_ARG="--fasta \$CSP2_DIR/queries";
-else
-        export QUERY_FASTA_ARG="";
-fi;
-
-if [ -n "$query_reads" ] && [ "$query_reads" != "None" ]; then
-        #for query in $query_reads:
-                ln -sf ${query} \$CSP2_DIR/queries/${query.element_identifier};
-        #end for
-        export QUERY_READS_ARG="--reads \$CSP2_DIR/queries";
-else
-        export QUERY_READS_ARG="";
-fi;
-
-if [ -n "$ref_fasta" ] && [ "$ref_fasta" != "None" ]; then
-        #for ref in $ref_fasta:
-                ln -sf ${ref} \$CSP2_DIR/references/${ref.element_identifier};
-        #end for
-        export REF_FASTA_ARG="--ref_fasta \$CSP2_DIR/references";
-else
-        export REF_FASTA_ARG="";
-fi;
-
-if [ -n "$ref_reads" ] && [ "$ref_reads" != "None" ]; then
-        #for ref in $ref_reads:
-                ln -sf ${ref} \$CSP2_DIR/references/${ref.element_identifier};
-        #end for
-        export REF_READS_ARG="--ref_reads \$CSP2_DIR/references";
-else
-        export REF_READS_ARG="";
-fi;
-
-if [ -n "$trim_name" ] && [ "$trim_name" != "None" ]; then
-        export TRIM_ARG="--trim_name $trim_name";
-else
-        export TRIM_ARG="";
-fi;
-
-if [[ "$rescue" == "true" ]]; then
-        export RESCUE_ARG="--rescue";
-else
-        export RESCUE_ARG="";
-fi;
-
-nextflow run ${__tool_directory__}/CSP2/CSP2.nf -profile csp2_galaxy --runmode snp \$QUERY_FASTA_ARG \$REF_FASTA_ARG \$QUERY_READS_ARG \$REF_READS_ARG \$TRIM_ARG \$RESCUE_ARG --readext $readext --forward $forward --reverse $reverse --ref_readext $readext --ref_forward $forward --ref_reverse $reverse --min_cov $min_cov --min_iden $min_iden --min_len $min_len --ref_edge $ref_edge --query_edge $query_edge --dwin $dwin --wsnps $wsnps --max_missing $max_missing --out \$CSP2_DIR/CSP2_SNP_Output > Nextflow_Log.txt 2>&1;
-
-zip -r CSP2_Output.zip CSP2_SNP_Output;
+mkdir -p queries references
+#set readext=""
+#for $reads in $query.coll
+#if $hasattr($reads, "is_of_type") and $reads.is_of_type("fasta")
+         && ln -sf '${reads}' 'queries/${reads.element_identifier}.fasta'
+#else if $reads.forward.is_of_type("fastq.gz","fastqsanger.gz")
+         #set readext="fastq.gz"
+         && ln -sf '${reads.forward}' 'queries/${reads.forward.element_identifier}_1.fastq.gz'
+         && ln -sf '${reads.reverse}' 'queries/${reads.reverse.element_identifier}_2.fastq.gz'
+#else if $reads.forward.is_of_type("fastq.bz2", "fastqsanger.bz2")
+         #set readext="fastq.bz2"
+         && ln -sf '${reads.forward}' 'queries/${reads.forward.element_identifier}_1.fastq.bz2'
+         && ln -sf '${reads.reverse}' 'queries/${reads.reverse.element_identifier}_2.fastq.bz2'
+#else 
+         #set readext="fastq"
+         && ln -sf '${reads.forward}' 'queries/${reads.forward.element_identifier}_1.fastq'
+         && ln -sf '${reads.reverse}' 'queries/${reads.reverse.element_identifier}_2.fastq'
+#end if
+#end for
+        && echo "*** Files in queries directory: ***"
+        && ln -sf '$source.reference' 'references/${source.reference.element_identifier}.fasta'
+        && nextflow run 
+        ${__tool_directory__}/CSP2/CSP2.nf -profile csp2_galaxy 
+        --runmode snp 
+        #if $query.query_select == 'reads'
+        --reads queries
+        --readext $readext 
+        --forward "_1.${readext}"
+        --reverse "_2.${readext}"
+        #else
+        --fasta queries
+        #end if
+        --ref_fasta 'references/${source.reference.element_identifier}.fasta'
+        --min_cov $opt.min_cov 
+        --min_iden $opt.min_iden 
+        --min_len $opt.min_len 
+        --ref_edge $opt.ref_edge 
+        --query_edge $opt.query_edge 
+        --dwin $opt.dwin 
+        --wsnps $opt.wsnps 
+        --out CSP2_SNP_Output
+        && echo "*** Files in output directory: ***"
+        && ls -lah CSP2_SNP_Output
+        && echo "*** Nextflow log follows: ***"
+        && cat .nextflow.log
 ]]>
         </command>
         <inputs>
-                <param name="query_fasta" type="data" format="fasta" value="" label="Query assemblies" multiple="true" optional="true" />
-                <param name="ref_fasta" type="data" format="fasta" value="" label="Reference assemblies" multiple="true" optional="true" />
-                <param name="query_reads" type="data" format="fastq,fastq.gz" value="" label="Query reads" multiple="true" optional="true" />
-                <param name="ref_reads" type="data" format="fastq,fastq.gz" value="" label="Reference reads" multiple="true" optional="true" />
-                <param name="min_cov" type="float" value="85" label="Minimum reference genome coverage to proceed with distance estimation" optional="true" />
-                <param name="min_iden" type="float" value="99" label="Minimum alignment percent identity to detect SNPs" optional="true" />
-                <param name="min_len" type="integer" value="500" label="Minimum alignment length to detect SNPs" optional="true" />
-                <param name="ref_edge" type="integer" value="150" label="Prune SNPs within this many bases of reference contig edge" optional="true" />
-                <param name="query_edge" type="integer" value="150" label="Prune SNPs within this many bases of query contig edge" optional="true" />
-                <param name="dwin" type="text" value="1000,125,15" label="Comma-separated set of window sizes for SNP density filtration (Set to 0 to disable density filtration)" optional="true" />
-                <param name="wsnps" type="text" value="3,2,1" label="Comma-separated list of maximum SNP counts per density window" optional="true" />
-                <param name="readext" type="text" value="fastq.gz" label="Read extension format (e.g., fastq.gz)" optional="true" />
-                <param name="forward" type="text" value="_1.fastq.gz" label="Forward read suffix (e.g. _1.fastq.gz)" optional="true" />
-                <param name="reverse" type="text" value="_2.fastq.gz" label="Forward read suffix (e.g. _2.fastq.gz)" optional="true" />
-                <param name="trim_name" type="text" value="" label="Text to remove from all file names (e.g., _contigs_skesa)" optional="true" />
-                <param name="rescue" type="boolean" value="false" label="Enable SNP edge rescue mode" optional="true" />
-                <param name="max_missing" type="float" value="50" label="Maximum percent of isolates allowed to have missing data to retain a SNP" optional="true" />
+                <conditional name="source">
+                        <param name="source_select" type="select" label="Use a curated GalaxyTrakr reference or a reference from your history">
+                                <option value="curated">Use a GalaxyTrakr reference</option>
+                                <option value="history">Use a reference from your history</option>
+                        </param>
+                        <when value="curated">
+                                <param name="reference" type="select" label="Select reference fasta">
+                                        <options from_data_table="all_fasta">
+                                                <filter type="sort_by" column="2"/>
+                                                <validator type="no_options" message="No assemblies are available for the selected input dataset"/>
+                                        </options>
+                                </param>
+                        </when>
+                        <when value="history">
+                                <param type="data" name="reference" format="fasta" label="Select reference FASTA"/>
+                        </when>
+                </conditional>
+                <conditional name="query">
+                        <param name="query_select" type="select" label="Screen a list of paired-reads or a list of assemblies">
+                                <option value="reads">Screen a list of paired reads</option>
+                                <option value="assemblies">Screen a list of assemblies</option>
+                        </param>
+                        <when value="reads">
+                                <param label="Paired reads" name="coll" type="data_collection" format="fastq,fastqsanger,fastq.gz,fastqsanger.gz,fastq.bz2,fastqsanger.bz2" collection_type="list:paired" />
+                        </when>
+                        <when value="assemblies">
+                                <param label="Assemblies" name="coll" type="data_collection" format="fasta" collection_type="list" />
+                        </when>
+                </conditional>
+                <section name="opt" title="Advanced options...">
+                        <param name="min_cov" type="float" value="85" label="Minimum reference genome coverage to proceed with distance estimation" optional="true" />
+                        <param name="min_iden" type="float" value="99" label="Minimum alignment percent identity to detect SNPs" optional="true" />
+                        <param name="min_len" type="integer" value="500" label="Minimum alignment length to detect SNPs" optional="true" />
+                        <param name="ref_edge" type="integer" value="150" label="Prune SNPs within this many bases of reference contig edge" optional="true" />
+                        <param name="query_edge" type="integer" value="150" label="Prune SNPs within this many bases of query contig edge" optional="true" />
+                        <param name="dwin" type="text" value="1000,125,15" label="Comma-separated set of window sizes for SNP density filtration (Set to 0 to disable density filtration)" optional="true" />
+                        <param name="wsnps" type="text" value="3,2,1" label="Comma-separated list of maximum SNP counts per density window" optional="true" />
+                </section>
         </inputs>
         <outputs>
-                <data name="nextflow_log" format="txt" label="Nextflow Log" from_work_dir="Nextflow_Log.txt" />
+                <!-- <data name="nextflow_log" format="txt" label="Nextflow Log" from_work_dir="Nextflow_Log.txt" /> -->
                 <data name="isolate_data" format="tabular" label="Isolate Data" from_work_dir="CSP2_SNP_Output/Isolate_Data.tsv" />
                 <data name="raw_mummer" format="tabular" label="Raw MUMmer Output" from_work_dir="CSP2_SNP_Output/Raw_MUMmer_Summary.tsv" />
-                <data name="csp2_zip" format="zip" label="Zipped Output" from_work_dir="CSP2_Output.zip" />
+                <!-- <data name="csp2_zip" format="zip" label="Zipped Output" from_work_dir="CSP2_Output.zip" /> -->
                 <collection name="reference_results" type="list:list">
                         <discover_datasets pattern="(?P&lt;name&gt;.+)/CSP2_SNP_Pipeline\.log" format="txt" visible="true" directory="./CSP2_SNP_Output/SNP_Analysis" />
                         <discover_datasets pattern="(?P&lt;name&gt;.+)/Reference_Screening\.tsv" format="tabular" visible="true" directory="./CSP2_SNP_Output/SNP_Analysis" />
@@ -96,9 +108,12 @@ zip -r CSP2_Output.zip CSP2_SNP_Output;
         </outputs>
         <tests>
                 <test>
-                        <param name="query_fasta">
+                        <param name="source_select" value="history" />
+                        <param name="reference" value="assemblies/Sample_A.fasta" />
+                        <param name="query_select" value="assemblies" />
+                        <param name="coll">
                                 <collection type="list">
-                                        <element name="Sample_A" value="assemblies/Sample_A.fasta" />
+                                        <!-- <element name="Sample_A" value="assemblies/Sample_A.fasta" /> -->
                                         <element name="Sample_B" value="assemblies/Sample_B.fasta" />
                                         <element name="Sample_C" value="assemblies/Sample_C.fasta" />
                                         <element name="Sample_D" value="assemblies/Sample_D.fasta" />
@@ -115,18 +130,24 @@ zip -r CSP2_Output.zip CSP2_SNP_Output;
                                         <element name="Sample_O" value="assemblies/Sample_O.fasta" />
                                 </collection>
                         </param>
-                        <param name="query_reads">
-                                <collection type="list">
-                                        <element name="Forward" value="reads/Week_42_Reads_1.fq.gz" />
-                                        <element name="Reverse" value="reads/Week_42_Reads_2.fq.gz" />
+
+                        <output name="isolate_data" value="Isolate_Data.tsv" />
+                </test>
+                <test>
+                        <param name="source_select" value="history" />
+                        <param name="reference" value="assemblies/Sample_A.fasta" ftype="fasta" />
+                        <param name="query_select" value="reads" />
+                        <param name="coll">
+                                <collection type="list:paired">
+                                        <element name="Sample_A">
+                                                <collection type="paired">
+                                                        <element name="forward" value="reads/Week_42_Reads_1.fq.gz" ftype="fastqsanger.gz" />
+                                                        <element name="reverse" value="reads/Week_42_Reads_2.fq.gz" ftype="fastqsanger.gz" />
+                                                </collection>
+                                        </element>
                                 </collection>
                         </param>
-
-                        <param name="ref_id" value="Sample_A,Sample_B" />
-                        <param name="readext" value="fq.gz" />
-                        <param name="forward" value="_1.fq.gz" />
-                        <param name="reverse" value="_2.fq.gz" />
-
+                        <output name="screening_results" value="Screening_Results.tsv" />
                         <output name="isolate_data" value="Isolate_Data.tsv" />
                 </test>
         </tests>

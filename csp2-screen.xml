@@ -58,6 +58,7 @@ else
 fi;
 
 nextflow run ${__tool_directory__}/CSP2/CSP2.nf -profile csp2_galaxy --runmode screen \$QUERY_FASTA_ARG \$REF_FASTA_ARG \$QUERY_READS_ARG \$REF_READS_ARG \$REF_ID_ARG \$TRIM_ARG --readext $readext --forward $forward --reverse $reverse --ref_readext $readext --ref_forward $forward --ref_reverse $reverse --min_cov $min_cov --min_iden $min_iden --min_len $min_len --ref_edge $ref_edge --query_edge $query_edge --dwin $dwin --wsnps $wsnps --out \$CSP2_DIR/CSP2_Screen_Output > Nextflow_Log.txt 2>&1;
+sleep 15;
 ]]>
         </command>
         <inputs>

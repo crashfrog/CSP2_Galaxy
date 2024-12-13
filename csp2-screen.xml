@@ -6,41 +6,41 @@
         </requirements>
         <version_command>nextflow -version</version_command>
         <command detect_errors="aggressive"><![CDATA[
-export CSP2_DIR=\$PWD;
-mkdir -p \$CSP2_DIR/queries \$CSP2_DIR/references;
+
+mkdir ./queries ./references;
 
 if [ -n "$query_fasta" ] && [ "$query_fasta" != "None" ]; then
         #for query in $query_fasta:
-                        ln -sf ${query} \$CSP2_DIR/queries/${query.element_identifier};
+                ln -sf ${query} ./queries/${query.element_identifier};
         #end for
-        export QUERY_FASTA_ARG="--fasta \$CSP2_DIR/queries";
+        export QUERY_FASTA_ARG="--fasta ./queries";
 else
         export QUERY_FASTA_ARG="";
 fi;
 
 if [ -n "$query_reads" ] && [ "$query_reads" != "None" ]; then
         #for query in $query_reads:
-                ln -sf ${query} \$CSP2_DIR/queries/${query.element_identifier};
+                ln -sf ${query} ./queries/${query.element_identifier};
         #end for
-        export QUERY_READS_ARG="--reads \$CSP2_DIR/queries";
+        export QUERY_READS_ARG="--reads ./queries";
 else
         export QUERY_READS_ARG="";
 fi;
 
 if [ -n "$ref_fasta" ] && [ "$ref_fasta" != "None" ]; then
         #for ref in $ref_fasta:
-                ln -sf ${ref} \$CSP2_DIR/references/${ref.element_identifier};
+                ln -sf ${ref} ./references/${ref.element_identifier};
         #end for
-        export REF_FASTA_ARG="--ref_fasta \$CSP2_DIR/references";
+        export REF_FASTA_ARG="--ref_fasta ./references";
 else
         export REF_FASTA_ARG="";
 fi;
 
 if [ -n "$ref_reads" ] && [ "$ref_reads" != "None" ]; then
         #for ref in $ref_reads:
-                ln -sf ${ref} \$CSP2_DIR/references/${ref.element_identifier};
+                ln -sf ${ref} ./references/${ref.element_identifier};
         #end for
-        export REF_READS_ARG="--ref_reads \$CSP2_DIR/references";
+        export REF_READS_ARG="--ref_reads ./references";
 else
         export REF_READS_ARG="";
 fi;
@@ -57,8 +57,8 @@ else
         export REF_ID_ARG="";
 fi;
 
-nextflow run ${__tool_directory__}/CSP2/CSP2.nf -profile csp2_galaxy --runmode screen \$QUERY_FASTA_ARG \$REF_FASTA_ARG \$QUERY_READS_ARG \$REF_READS_ARG \$REF_ID_ARG \$TRIM_ARG --readext $readext --forward $forward --reverse $reverse --ref_readext $readext --ref_forward $forward --ref_reverse $reverse --min_cov $min_cov --min_iden $min_iden --min_len $min_len --ref_edge $ref_edge --query_edge $query_edge --dwin $dwin --wsnps $wsnps --out \$CSP2_DIR/CSP2_Screen_Output > Nextflow_Log.txt 2>&1;
-sleep 15;
+nextflow run ${__tool_directory__}/CSP2/CSP2.nf -profile csp2_galaxy --runmode screen \$QUERY_FASTA_ARG \$REF_FASTA_ARG \$QUERY_READS_ARG \$REF_READS_ARG \$REF_ID_ARG \$TRIM_ARG --readext $readext --forward $forward --reverse $reverse --ref_readext $readext --ref_forward $forward --ref_reverse $reverse --min_cov $min_cov --min_iden $min_iden --min_len $min_len --ref_edge $ref_edge --query_edge $query_edge --dwin $dwin --wsnps $wsnps --out ./CSP2_Screen_Output > Nextflow_Log.txt 2>&1 &&
+ls -la CSP2_Screen_Output;
 ]]>
         </command>
         <inputs>
@@ -83,7 +83,6 @@ sleep 15;
                 <data name="raw_mummer" format="tabular" label="Raw MUMmer Output" from_work_dir="CSP2_Screen_Output/Raw_MUMmer_Summary.tsv" />
                 <data name="isolate_data" format="tabular" label="Isolate Data" from_work_dir="CSP2_Screen_Output/Isolate_Data.tsv" />
                 <data name="screening_results" format="tabular" label="Screening Results" from_work_dir="CSP2_Screen_Output/Screening_Results.tsv" />
-                <data name="nextflow_log" format="txt" label="Nextflow Log" from_work_dir="Nextflow_Log.txt" />
         </outputs>
         <tests>
                 <test>

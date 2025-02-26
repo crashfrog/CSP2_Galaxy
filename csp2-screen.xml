@@ -1,11 +1,14 @@
 <tool id="csp2-screen" name="CSP2 (Screening Mode)" version="0.9.7_Dev21">
         <description>Screen query assemblies against reference assemblies</description>
         <requirements>
-                <requirement type="package" version="24.10.1">nextflow</requirement>
-                <requirement type="package" version="1.5.8">micromamba</requirement>
+                <!-- <requirement type="package" version="24.10.1">nextflow</requirement>
+                <requirement type="package" version="1.5.8">micromamba</requirement> -->
+                <container type="docker">cfsanbiostatistics/csp2:v.0.9.7.4</container>
         </requirements>
         <version_command>nextflow -version</version_command>
         <command detect_errors="exit_code"><![CDATA[
+set -e
+set -x
 mkdir -p queries references
 #set readext=""
 #for $reads in $query.coll

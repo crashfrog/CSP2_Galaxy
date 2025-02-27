@@ -7,8 +7,6 @@
         </requirements>
         <version_command>nextflow -version</version_command>
         <command detect_errors="exit_code"><![CDATA[
-set -e
-set -x
 mkdir -p queries references
 #set readext=""
 #for $reads in $query.coll

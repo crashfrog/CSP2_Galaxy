@@ -3,9 +3,9 @@ runners:
     load: galaxy.jobs.runners.local:LocalJobRunner
     workers: 16
 
-handling:
-  processes:
-    handler0:
+# handling:
+#   processes:
+#     handler0:
 
 execution:
   default: local
@@ -18,14 +18,15 @@ execution:
       # container: "auto"
       docker_volumes: $defaults
       # docker_set_user: null
-      docker_run_extra_arguments: "--entrypoint '/bin/sh'"
+      docker_run_extra_arguments: "--entrypoint ''"
+      docker_set_user: root
 
 tools:
 - id: csp2-snp 
-  handler: handler0
+  # handler: handler0
   environment: docker_local
 - id: csp2-screen
-  handler: handler0
+  # handler: handler0
   environment: docker_local
 
 limits:

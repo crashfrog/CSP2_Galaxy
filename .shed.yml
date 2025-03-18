@@ -1,0 +1,16 @@
+categories: [Tool]
+description: CSP 2
+name: csp2
+owner: rliterman
+exclude:
+ - test_data
+ - .git
+ - .gitignore
+ - LICENSE
+ - README.md
+ - tool_test_output.html
+ - tool_test_output.json
+ - .python-version
+ - job_conf_sample.yml
+ - job_conf.yml
+ - CSP2

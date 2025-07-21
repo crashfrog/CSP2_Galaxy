@@ -1,45 +1,24 @@
-<tool id="csp2-screen" name="CSP2 (Screening Mode)" version="0.9.7_Dev21">
+<tool id="csp2-screen" name="CSP2 (Screening Mode)" version="0.9.7.7">
         <description>Screen query assemblies against reference assemblies</description>
         <requirements>
                 <!-- <requirement type="package" version="24.10.1">nextflow</requirement>
                 <requirement type="package" version="1.5.8">micromamba</requirement> -->
-                <container type="docker">cfsanbiostatistics/csp2:v.0.9.7.4</container>
+                <container type="docker">cfsanbiostatistics/csp2:v.0.9.7.7-galaxy</container>
         </requirements>
         <version_command>nextflow -version</version_command>
         <command detect_errors="exit_code"><![CDATA[
-mkdir -p queries references
+mkdir -p queries references .nextflow
 #set readext=""
-#for $reads in $query.coll
-#if $hasattr($reads, "is_of_type") and $reads.is_of_type("fasta")
-         && ln -sf ${reads} 'queries/${reads.element_identifier}.fasta'
-#else if $reads.forward.is_of_type("fastq.gz","fastqsanger.gz")
-         #set readext="fastq.gz"
-         && ln -sf '${reads.forward}' 'queries/${reads.forward.element_identifier}_1.fastq.gz'
-         && ln -sf '${reads.reverse}' 'queries/${reads.reverse.element_identifier}_2.fastq.gz'
-#else if $reads.forward.is_of_type("fastq.bz2", "fastqsanger.bz2")
-         #set readext="fastq.bz2"
-         && ln -sf '${reads.forward}' 'queries/${reads.forward.element_identifier}_1.fastq.bz2'
-         && ln -sf '${reads.reverse}' 'queries/${reads.reverse.element_identifier}_2.fastq.bz2'
-#else 
-         #set readext="fastq"
-         && ln -sf '${reads.forward}' 'queries/${reads.forward.element_identifier}_1.fastq'
-         && ln -sf '${reads.reverse}' 'queries/${reads.reverse.element_identifier}_2.fastq'
-#end if
+#for $reads in $coll
+        && ln -sf '${reads}' 'queries/${reads.element_identifier}.fasta'
 #end for
         && echo "*** Files in queries directory: ***"
         && ls -lah queries/
         && ln -sf '$source.reference' 'references/${source.reference.element_identifier}.fasta'
         && nextflow run 
-        ${__tool_directory__}/CSP2/CSP2.nf -profile csp2_galaxy
-        --runmode screen 
-        #if $query.query_select == 'reads'
-        --reads queries
-        --readext $readext 
-        --forward "_1.${readext}"
-        --reverse "_2.${readext}"
-        #else
+        /app/CSP2.nf -c $__tool_directory__/nextflow.config -profile standard
+        --runmode screen
         --fasta queries
-        #end if
         --ref_fasta 'references/${source.reference.element_identifier}.fasta'
         --min_cov $opt.min_cov 
         --min_iden $opt.min_iden 
@@ -49,6 +28,7 @@ mkdir -p queries references
         --dwin $opt.dwin 
         --wsnps $opt.wsnps 
         --out CSP2_Screen_Output
+        --quiet
         && echo "*** Files in output directory: ***"
         && ls -lah CSP2_Screen_Output
         && echo "*** Nextflow log follows: ***"
@@ -73,7 +53,7 @@ mkdir -p queries references
                                 <param type="data" name="reference" format="fasta" label="Select reference FASTA"/>
                         </when>
                 </conditional>
-                <conditional name="query">
+                <!-- <conditional name="query">
                         <param name="query_select" type="select" label="Screen a list of paired-end reads or a list of assemblies">
                                 <option value="reads">Screen a list of paired reads</option>
                                 <option value="assemblies">Screen a list of assemblies</option>
@@ -81,10 +61,10 @@ mkdir -p queries references
                         <when value="reads">
                                 <param label="Paired reads" name="coll" type="data_collection" format="fastq,fastqsanger,fastq.gz,fastqsanger.gz,fastq.bz2,fastqsanger.bz2" collection_type="list:paired" />
                         </when>
-                        <when value="assemblies">
+                        <when value="assemblies"> -->
                                 <param label="Assemblies" name="coll" type="data_collection" format="fasta" collection_type="list" />
-                        </when>
-                </conditional>
+                        <!-- </when> -->
+                <!-- </conditional> -->
                 <section name="opt" title="Advanced options...">
                         <param argument="--min_cov" name="min_cov" type="float" value="85" label="Minimum reference genome coverage to proceed with distance estimation" />
                         <param argument="--min_eden" name="min_iden" type="float" value="99" label="Minimum alignment percent identity to detect SNPs" />
@@ -105,7 +85,7 @@ mkdir -p queries references
                 <test>
                         <param name="source_select" value="history" />
                         <param name="reference" value="assemblies/Sample_A.fasta" ftype="fasta" />
-                        <param name="query_select" value="assemblies" />
+                        <!-- <param name="query_select" value="assemblies" /> -->
                         <param name="coll">
                                 <collection type="list">
                                         <!-- <element name="Sample_A" value="assemblies/Sample_A.fasta" /> -->
@@ -129,7 +109,7 @@ mkdir -p queries references
                         <output name="screening_results" value="Screening_Results.tsv" />
                         <output name="isolate_data" value="Isolate_Data.tsv" />
                 </test>
-                <test>
+                <!-- <test>
                         <param name="source_select" value="history" />
                         <param name="reference" value="assemblies/Sample_A.fasta" ftype="fasta" />
                         <param name="query_select" value="reads" />
@@ -145,7 +125,7 @@ mkdir -p queries references
                         </param>
                         <output name="screening_results" value="Screening_Results.tsv" />
                         <output name="isolate_data" value="Isolate_Data.tsv" />
-                </test>
+                </test> -->
         </tests>
         <help>
         This tool takes query assemblies and reference assemblies and calculates the pairwise distance between each query/reference combination. If no reference is provided, all queries are compared to all other queries.

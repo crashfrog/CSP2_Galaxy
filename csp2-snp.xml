@@ -12,14 +12,14 @@ mkdir -p queries references .nextflow
 #for $reads in $coll
         && ln -sf '${reads}' 'queries/${reads.element_identifier}.fasta'
 #end for
+        && ln -sf '$source.reference' 'references/${source.reference.element_identifier.replace(": ", ".").replace(" ", "_")}.fasta'
         && echo "*** Files in queries directory: ***"
         && ls -lah queries/
-        && ln -sf '$source.reference' 'references/${source.reference.element_identifier}.fasta'
         && nextflow run 
         /app/CSP2.nf -c $__tool_directory__/nextflow.config -profile standard
         --runmode snp 
         --fasta queries
-        --ref_fasta 'references/${source.reference.element_identifier}.fasta'
+        --ref_fasta 'references/${source.reference.element_identifier.replace(": ", ".").replace(" ", "_")}.fasta'
         --min_cov $opt.min_cov 
         --min_iden $opt.min_iden 
         --min_len $opt.min_len 
@@ -31,6 +31,8 @@ mkdir -p queries references .nextflow
         --quiet
         && echo "*** Files in output directory: ***"
         && ls -lah CSP2_SNP_Output
+        && tail -n +2 CSP2_SNP_Output/Isolate_Data.tsv > ${isolate_data}
+        && tail -n +2 CSP2_SNP_Output/Raw_MUMmer_Summary.tsv > ${raw_mummer}
         && echo "*** Nextflow log follows: ***"
         && cat .nextflow.log
 ]]>
@@ -77,8 +79,16 @@ mkdir -p queries references .nextflow
         </inputs>
         <outputs>
                 <!-- <data name="nextflow_log" format="txt" label="Nextflow Log" from_work_dir="Nextflow_Log.txt" /> -->
-                <data name="isolate_data" format="tabular" label="Isolate Data" from_work_dir="CSP2_SNP_Output/Isolate_Data.tsv" />
-                <data name="raw_mummer" format="tabular" label="Raw MUMmer Output" from_work_dir="CSP2_SNP_Output/Raw_MUMmer_Summary.tsv" />
+                <data name="isolate_data" format="tabular" label="Isolate Data">
+                        <actions>
+                                <action name="column_names" type="metadata" default="Isolate_ID,Isolate_Type,Assembly_Path,Contig_Count,Assembly_Bases,N50,N90,L50,L90,SHA256" />
+                        </actions>
+                </data>
+                <data name="raw_mummer" format="tabular" label="Raw MUMmer Output">
+                        <actions>
+                                <action name="column_names" type="metadata" default="SNPDiffs_File,Query_ID,Query_Assembly,Query_Contig_Count,Query_Assembly_Bases,Query_N50,Query_N90,Query_L50,Query_L90,Query_SHA256,Reference_ID,Reference_Assembly,Reference_Contig_Count,Reference_Assembly_Bases,Reference_N50,Reference_N90,Reference_L50,Reference_L90,Reference_SHA256,SNPs,Reference_Percent_Aligned,Query_Percent_Aligned,Median_Percent_Identity,Median_Alignment_Length,Kmer_Similarity,Shared_Kmers,Reference_Unique_Kmers,Query_Unique_Kmers,Reference_Breakpoints,Query_Breakpoints,Reference_Relocations,Query_Relocations,Reference_Translocations,Query_Translocations,Reference_Inversions,Query_Inversions,Reference_Insertions,Query_Insertions,Reference_Tandem,Query_Tandem,Indels,Invalid,gSNPs,gIndels" />
+                        </actions>
+                </data>
                 <!-- <data name="csp2_zip" format="zip" label="Zipped Output" from_work_dir="CSP2_Output.zip" /> -->
                 <!-- <discover_datasets pattern="(?P&lt;name&gt;.+)/CSP2_SNP_Pipeline\.log" format="txt" visible="true" directory="./CSP2_SNP_Output/SNP_Analysis" /> -->
                 <!-- <discover_datasets pattern="(?P&lt;name&gt;.+)/Reference_Screening\.tsv" format="tabular" visible="true" directory="./CSP2_SNP_Output/SNP_Analysis" />

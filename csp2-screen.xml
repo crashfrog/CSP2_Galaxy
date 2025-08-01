@@ -12,14 +12,14 @@ mkdir -p queries references .nextflow
 #for $reads in $coll
         && ln -sf '${reads}' 'queries/${reads.element_identifier}.fasta'
 #end for
+        && ln -sf '$source.reference' 'references/${source.reference.element_identifier.replace(": ", ".").replace(" ", "_")}.fasta'
         && echo "*** Files in queries directory: ***"
         && ls -lah queries/
-        && ln -sf '$source.reference' 'references/${source.reference.element_identifier}.fasta'
         && nextflow run 
         /app/CSP2.nf -c $__tool_directory__/nextflow.config -profile standard
         --runmode screen
         --fasta queries
-        --ref_fasta 'references/${source.reference.element_identifier}.fasta'
+        --ref_fasta 'references/${source.reference.element_identifier.replace(": ", ".").replace(" ", "_")}.fasta'
         --min_cov $opt.min_cov 
         --min_iden $opt.min_iden 
         --min_len $opt.min_len 
@@ -31,6 +31,9 @@ mkdir -p queries references .nextflow
         --quiet
         && echo "*** Files in output directory: ***"
         && ls -lah CSP2_Screen_Output
+        && tail -n +2 CSP2_Screen_Output/Isolate_Data.tsv > ${isolate_data}
+        && tail -n +2 CSP2_Screen_Output/Raw_MUMmer_Summary.tsv > ${raw_mummer}
+        && tail -n +2 CSP2_Screen_Output/Screening_Results.tsv > ${screening_results}
         && echo "*** Nextflow log follows: ***"
         && cat .nextflow.log
 ]]>
@@ -76,9 +79,21 @@ mkdir -p queries references .nextflow
                 </section>
         </inputs>
         <outputs>
-                <data name="raw_mummer" format="tabular" label="Raw MUMmer Output" from_work_dir="CSP2_Screen_Output/Raw_MUMmer_Summary.tsv" />
-                <data name="isolate_data" format="tabular" label="Isolate Data" from_work_dir="CSP2_Screen_Output/Isolate_Data.tsv" />
-                <data name="screening_results" format="tabular" label="Screening Results" from_work_dir="CSP2_Screen_Output/Screening_Results.tsv" />
+                <data name="raw_mummer" format="tabular" label="Raw MUMmer Output">
+                        <actions>
+                                <action name="column_names" type="metadata" default="SNPDiffs_File,Query_ID,Query_Assembly,Query_Contig_Count,Query_Assembly_Bases,Query_N50,Query_N90,Query_L50,Query_L90,Query_SHA256,Reference_ID,Reference_Assembly,Reference_Contig_Count,Reference_Assembly_Bases,Reference_N50,Reference_N90,Reference_L50,Reference_L90,Reference_SHA256,SNPs,Reference_Percent_Aligned,Query_Percent_Aligned,Median_Percent_Identity,Median_Alignment_Length,Kmer_Similarity,Shared_Kmers,Reference_Unique_Kmers,Query_Unique_Kmers,Reference_Breakpoints,Query_Breakpoints,Reference_Relocations,Query_Relocations,Reference_Translocations,Query_Translocations,Reference_Inversions,Query_Inversions,Reference_Insertions,Query_Insertions,Reference_Tandem,Query_Tandem,Indels,Invalid,gSNPs,gIndels" />
+                        </actions>
+                </data>
+                <data name="isolate_data" format="tabular" label="Isolate Data">
+                        <actions>
+                                <action name="column_names" type="metadata" default="Isolate_ID,Isolate_Type,Assembly_Path,Contig_Count,Assembly_Bases,N50,N90,L50,L90,SHA256" />
+                        </actions>
+                </data>
+                <data name="screening_results" format="tabular" label="Screening Results">
+                        <actions>
+                                <action name="column_names" type="metadata" default="Query_ID,Reference_ID,Screen_Category,CSP2_Screen_SNPs,Query_Percent_Aligned,Reference_Percent_Aligned,Query_Contigs,Query_Bases,Reference_Contigs,Reference_Bases,Raw_SNPs,Purged_Length,Purged_Identity,Purged_LengthIdentity,Purged_Invalid,Purged_Indel,Purged_Duplicate,Purged_Het,Purged_Density,Filtered_Query_Edge,Filtered_Ref_Edge,Filtered_Both_Edge,Kmer_Similarity,Shared_Kmers,Query_Unique_Kmers,Reference_Unique_Kmers,MUMmer_gSNPs,MUMmer_gIndels" />
+                        </actions>
+                </data>
                 <!-- <data name="nextflow_log" format="txt" label="Nextflow Log" from_work_dir="Nextflow_Log.txt" /> -->
         </outputs>
         <tests>

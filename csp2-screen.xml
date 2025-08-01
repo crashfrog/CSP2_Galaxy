@@ -10,7 +10,7 @@
 mkdir -p queries references .nextflow
 #set readext=""
 #for $reads in $coll
-        && ln -sf '${reads}' 'queries/${reads.element_identifier}.fasta'
+        && ln -sf '${reads}' 'queries/${reads.element_identifier.replace(": ", ".").replace(" ", "_")}.fasta'
 #end for
         && ln -sf '$source.reference' 'references/${source.reference.element_identifier.replace(": ", ".").replace(" ", "_")}.fasta'
         && echo "*** Files in queries directory: ***"

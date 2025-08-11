@@ -1,11 +1,11 @@
 categories: [Tool]
 description: CSP 2
 name: csp2
-owner: rliterman
+owner: jpayne
 exclude:
- - test_data
- - .git
- - .gitignore
+ - test-data/
+ - .git/
+ - .gitignore/
  - LICENSE
  - README.md
  - tool_test_output.html

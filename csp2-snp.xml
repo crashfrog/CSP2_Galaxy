@@ -9,17 +9,18 @@
         <command detect_errors="exit_code"><![CDATA[
 mkdir -p queries references .nextflow
 #set readext=""
+#set renamedref=$source.reference.element_identifier.replace(": ", ".").replace(" ", "_")
 #for $reads in $coll
         && ln -sf '${reads}' 'queries/${reads.element_identifier.replace(": ", ".").replace(" ", "_")}.fasta'
 #end for
-        && ln -sf '$source.reference' 'references/${source.reference.element_identifier.replace(": ", ".").replace(" ", "_")}.fasta'
+        && ln -sf '$source.reference' 'references/${renamedref}.fasta'
         && echo "*** Files in queries directory: ***"
         && ls -lah queries/
         && nextflow run 
         /app/CSP2.nf -c $__tool_directory__/nextflow.config -profile standard
         --runmode snp 
         --fasta queries
-        --ref_fasta 'references/${source.reference.element_identifier.replace(": ", ".").replace(" ", "_")}.fasta'
+        --ref_fasta 'references/${renamedref}.fasta'
         --min_cov $opt.min_cov 
         --min_iden $opt.min_iden 
         --min_len $opt.min_len 
@@ -30,9 +31,12 @@ mkdir -p queries references .nextflow
         --out CSP2_SNP_Output
         --quiet
         && echo "*** Files in output directory: ***"
-        && ls -lah CSP2_SNP_Output
+        && ls -lahR CSP2_SNP_Output
         && tail -n +2 CSP2_SNP_Output/Isolate_Data.tsv > ${isolate_data}
         && tail -n +2 CSP2_SNP_Output/Raw_MUMmer_Summary.tsv > ${raw_mummer}
+        && tail -n +2 CSP2_SNP_Output/SNP_Analysis/${renamedref}/snp_distance_pairwise_preserved.tsv > ${snp_pairwise}
+        && cat CSP2_SNP_Output/SNP_Analysis/${renamedref}/snplist_preserved.txt > ${snp_list}
+        && cat CSP2_SNP_Output/SNP_Analysis/${renamedref}/snpma_preserved.fasta > ${snp_matrix}
         && echo "*** Nextflow log follows: ***"
         && cat .nextflow.log
 ]]>
@@ -95,6 +99,16 @@ mkdir -p queries references .nextflow
                 <discover_datasets pattern="(?P&lt;name&gt;.+)/snp_distance_matrix_preserved\.tsv" format="tabular" visible="true" directory="./CSP2_SNP_Output/SNP_Analysis" />
                 <discover_datasets pattern="(?P&lt;name&gt;.+)/snp_distance_pairwise_preserved\.tsv" format="tabular" visible="true" directory="./CSP2_SNP_Output/SNP_Analysis" />
                 <discover_datasets pattern="(?P&lt;name&gt;.+)/snpma_preserved\.fasta" format="fasta" visible="true" directory="./CSP2_SNP_Output/SNP_Analysis" /> -->
+                <data name="snp_pairwise" format="tabular" label="Preserved Pairwise SNP Distances">
+                        <actions>
+                                <action name="column_names" type="metadata" default="Query_1,Query_2,SNP_Distance,SNPs_Cocalled" />
+                        </actions>
+                </data>
+                <data name="snp_list" format="txt" label="Preserved SNP List" />
+                <data name="snp_matrix" format="fasta" label="Preserved SNP Matrix" />
+                <discover_datasets pattern="(?P&lt;name&gt;.+)/snp_distance_matrix\.tsv" format="tabular" visible="false" directory="./CSP2_SNP_Output/SNP_Analysis" />
+                <discover_datasets pattern="(?P&lt;name&gt;.+)/snp_distance_pairwise\.tsv" format="tabular" visible="false" directory="./CSP2_SNP_Output/SNP_Analysis" />
+                <discover_datasets pattern="(?P&lt;name&gt;.+)/snpma\.fasta" format="fasta" visible="false" directory="./CSP2_SNP_Output/SNP_Analysis" />
         </outputs>
         <tests>
                 <test>

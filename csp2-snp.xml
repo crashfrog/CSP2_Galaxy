@@ -1,9 +1,7 @@
 <tool id="csp2-snp" name="CSP2 (SNP Pipeline Mode)" version="0.9.7.7">
         <description>Run SNP Pipeline analysis on isolates using one or more references.</description>
         <requirements>
-                <!-- <requirement type="package" version="24.10.1">nextflow</requirement>
-                <requirement type="package" version="1.5.8">micromamba</requirement> -->
-                <container type="docker">cfsanbiostatistics/csp2:v.0.9.7.7-galaxy</container>
+                <container type="docker">docker.io/cfsanbiostatistics/csp2:v.0.9.7.7-galaxy</container>
         </requirements>
         <version_command>nextflow -version</version_command>
         <command detect_errors="exit_code"><![CDATA[

@@ -7,18 +7,20 @@
         <command detect_errors="exit_code"><![CDATA[
 mkdir -p queries references .nextflow
 #set readext=""
-#set renamedref=$source.reference.element_identifier.replace(": ", ".").replace(" ", "_")
 #for $reads in $coll
         && ln -sf '${reads}' 'queries/${reads.element_identifier.replace(": ", ".").replace(" ", "_")}.fasta'
 #end for
-        && ln -sf '$source.reference' 'references/${renamedref}.fasta'
+#for $ref in $source.reference
+        #set renamedref=$ref.element_identifier.replace(": ", ".").replace(" ", "_")
+        && ln -sf '$ref' 'references/${renamedref}.fasta'
+#end for
         && echo "*** Files in queries directory: ***"
         && ls -lah queries/
         && nextflow run 
         /app/CSP2.nf -c $__tool_directory__/nextflow.config -profile standard
         --runmode screen
         --fasta queries
-        --ref_fasta 'references/${renamedref}.fasta'
+        --ref_fasta 'references'
         --min_cov $opt.min_cov 
         --min_iden $opt.min_iden 
         --min_len $opt.min_len 
@@ -44,7 +46,7 @@ mkdir -p queries references .nextflow
                                 <option value="history">Use a reference from your history</option>
                         </param>
                         <when value="curated">
-                                <param name="reference" type="select" label="Select reference fasta">
+                                <param name="reference" type="select" label="Select reference fasta" multiple="true" min="1" >
                                         <options from_data_table="all_fasta">
                                                 <filter type="sort_by" column="2"/>
                                                 <validator type="no_options" message="No assemblies are available for the selected input dataset"/>
@@ -52,7 +54,7 @@ mkdir -p queries references .nextflow
                                 </param>
                         </when>
                         <when value="history">
-                                <param type="data" name="reference" format="fasta" label="Select reference FASTA"/>
+                                <param type="data" name="reference" format="fasta" label="Select reference FASTA" multiple="true" min="1" />
                         </when>
                 </conditional>
                 <!-- <conditional name="query">

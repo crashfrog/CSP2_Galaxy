@@ -11,7 +11,7 @@ mkdir -p queries references .nextflow
         && ln -sf '${reads}' 'queries/${reads.element_identifier.replace(": ", ".").replace(" ", "_")}.fasta'
 #end for
 #for $ref in $source.reference
-        #set renamedref=$ref.element_identifier.replace(": ", ".").replace(" ", "_")
+        #set renamedref=$ref.element_identifier.replace(": ", ".").replace(" ", "_").replace("(","").replace(")","")
         && ln -sf '$ref' 'references/${renamedref}.fasta'
 #end for
         && echo "*** Files in queries directory: ***"
@@ -124,6 +124,21 @@ mkdir -p queries references .nextflow
 
                         <output name="screening_results" value="Screening_Results.tsv" />
                         <output name="isolate_data" value="Isolate_Data.tsv" />
+                </test>
+                <test>
+                        <!-- Test that spaces and parens are handled -->
+                        <param name="source_select" value="history" />
+                        <param name="reference" value="assemblies/Sample (A).fasta" />
+                        <!-- <param name="query_select" value="assemblies" /> -->
+                        <param name="coll">
+                                <collection type="list">
+                                        <!-- <element name="Sample_A" value="assemblies/Sample_A.fasta" /> -->
+                                        <element name="Sample_B" value="assemblies/Sample_B.fasta" />
+                                        <element name="Sample_C" value="assemblies/Sample_C.fasta" />
+                                        <element name="Sample_D" value="assemblies/Sample_D.fasta" />
+                                </collection>
+                        </param>
+                        <output name="isolate_data" value="Isolate_Data.tsv" compare="diff" lines_diff="17" />
                 </test>
                 <!-- <test>
                         <param name="source_select" value="history" />
